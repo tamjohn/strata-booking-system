@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+echo "Running lint check and attempting to fix issues..."
+yarn lint
+
+if [ $? -ne 0 ]; then
+    echo "Lint check found issues that could not be automatically fixed. Please fix them manually before committing."
+    exit 1
+else
+    echo "Lint check passed with no issues."
+fi
