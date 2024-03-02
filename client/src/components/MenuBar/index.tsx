@@ -40,7 +40,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ activeTab, setActiveTab }) => 
         src={AnnouncementsIcon}
         alt="Announcements"
       />
-      <span>Announcements</span>
+      <span>Bulletin</span>
     </Styled.MenuButton>
     <Styled.MenuButton
       active={activeTab === 'requests'}

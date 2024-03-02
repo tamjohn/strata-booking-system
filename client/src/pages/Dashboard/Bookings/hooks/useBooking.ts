@@ -74,7 +74,25 @@ export const useBookings = () => {
     }
   };
 
+  const deleteBooking = async (eid: number): Promise<void> => {
+    try {
+      const response = await fetch(`http://localhost:5000/bookings/${eid}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete the booking');
+      }
+      setBookings((prevBookings) => prevBookings.filter((booking) => booking.eid !== eid));
+      if (selectedBooking && selectedBooking.eid === eid) {
+        setSelectedBooking(null);
+      }
+      console.log('Booking was deleted successfully');
+    } catch (err) {
+      console.error('Error deleting booking:', err);
+    }
+  };
   const setDescriptionHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    console.log('Setting description to:', e.target.value);
     setDescription(e.target.value);
   };
 
@@ -109,5 +127,7 @@ export const useBookings = () => {
     hookBookingID: bookingID,
 
     hookUpdateSingleBooking: updateSingleBooking,
+
+    hookDeleteBooking: deleteBooking,
   };
 };

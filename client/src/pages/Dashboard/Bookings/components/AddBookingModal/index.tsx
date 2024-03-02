@@ -32,24 +32,34 @@ export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClos
       const body = {
         eid: Math.floor(Math.random() * 1000),
         title: description,
-        start: new Date(startDate),
-        end_time: new Date(endDate),
+        start: new Date(startDate).toISOString(),
+        end_time: new Date(endDate).toISOString(),
       };
-      await fetch('http://localhost:5000/bookings', {
+      fetch('http://localhost:5000/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-      });
-
-      setDescription('');
-      setStartDate('');
-      setEndDate('');
-      onClose();
-      hook.hookGetBookings(); 
-
-      console.log('Booking submitted successfully');
-    } catch (err: any) {
-      console.log('Error submitting data', err.message);
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Response data:', data);
+          setDescription('');
+          setStartDate('');
+          setEndDate('');
+          onClose();
+          hook.hookGetBookings();
+          console.log('Booking submitted successfully');
+        })
+        .catch((err) => {
+          console.error('Error submitting data', err);
+        });
+    } catch (err) {
+      console.error('An unexpected error occurred:', err);
     }
   };
 
@@ -58,42 +68,51 @@ export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClos
   }
 
   return (
-    <Styled.PopUpBox>
-      <Styled.ModalOverlay>
-        <form onSubmit={handleSubmit}>
-          <Styled.FormField>
-            <Styled.Label>Title:</Styled.Label>
-            <Styled.Input
-              type="text"
-              value={description}
-              onChange={handleInputTitle}
-            />
-          </Styled.FormField>
-          <Styled.FormField>
-            <Styled.Label>Start Time:</Styled.Label>
-            <Styled.Input
-              type="datetime-local"
-              value={startDate}
-              onChange={handleStartDate}
-            />
-          </Styled.FormField>
-          <Styled.FormField>
-            <Styled.Label>End Time:</Styled.Label>
-            <Styled.Input
-              type="datetime-local"
-              value={endDate}
-              onChange={handleEndDate}
-            />
-          </Styled.FormField>
-          <Styled.StyledButton type="submit">Submit</Styled.StyledButton>
-          <Styled.StyledCancelButton
-            type="button"
-            onClick={onClose}
-          >
-            Cancel
-          </Styled.StyledCancelButton>
-        </form>
-      </Styled.ModalOverlay>
-    </Styled.PopUpBox>
+    <Styled.ModalOverlay>
+      <Styled.ModalContainer>
+        <Styled.ModalHeader>
+          <Styled.ModalTitle>Add New Booking</Styled.ModalTitle>
+          <Styled.CloseButton onClick={onClose}>×</Styled.CloseButton>
+        </Styled.ModalHeader>
+        <Styled.ModalBody>
+          <form onSubmit={handleSubmit}>
+            <Styled.FormField>
+              <Styled.Label>Description (include unit number + activity):</Styled.Label>
+              <Styled.Input
+                type="text"
+                value={description}
+                onChange={handleInputTitle}
+                placeholder="Enter the title of the booking"
+              />
+            </Styled.FormField>
+            <Styled.FormField>
+              <Styled.Label>Start Time:</Styled.Label>
+              <Styled.Input
+                type="datetime-local"
+                value={startDate}
+                onChange={handleStartDate}
+              />
+            </Styled.FormField>
+            <Styled.FormField>
+              <Styled.Label>End Time:</Styled.Label>
+              <Styled.Input
+                type="datetime-local"
+                value={endDate}
+                onChange={handleEndDate}
+              />
+            </Styled.FormField>
+            <Styled.ButtonRow>
+              <Styled.SubmitButton type="submit">Submit</Styled.SubmitButton>
+              <Styled.CancelButton
+                type="button"
+                onClick={onClose}
+              >
+                Cancel
+              </Styled.CancelButton>
+            </Styled.ButtonRow>
+          </form>
+        </Styled.ModalBody>
+      </Styled.ModalContainer>
+    </Styled.ModalOverlay>
   );
 };

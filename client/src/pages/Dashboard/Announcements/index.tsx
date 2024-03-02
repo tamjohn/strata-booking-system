@@ -2,8 +2,8 @@ import React from 'react';
 
 const Announcements = () => (
   <div>
-    <h1>Announcements</h1>
-    <p>This is the Announcements page. Work in progress...</p>
+    <h1>Bulletin</h1>
+    <p>This is the Bulletin page. Work in progress...</p>
   </div>
 );
 

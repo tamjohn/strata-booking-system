@@ -7,7 +7,7 @@ export const DashboardContainer = styled.div`
 `;
 
 export const MenuBarContainer = styled.div`
-  width: 15%;
+  width: 10%;
   background: #f8f8f8;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@ export const MenuBarContainer = styled.div`
 `;
 
 export const ContentContainer = styled.div`
-  width: 85%;
+  width: 90%;
   background: #ffffff; 
   padding: 20px; 
   overflow-y: auto; 

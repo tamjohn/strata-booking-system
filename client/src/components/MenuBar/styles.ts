@@ -5,7 +5,7 @@ type MenuButtonProps = {
 };
 
 export const MenuBarContainer = styled.div`
-  width: 15vw; 
+  width: 10vw; 
   display: flex;
   flex-direction: column;
   justify-content: space-between; 
@@ -19,18 +19,14 @@ export const MenuButton = styled.button<MenuButtonProps>`
   flex-direction: column;
   align-items: center;
   justify-content: center; 
-  padding: 2vh 0; 
-  margin: 1vh 0; 
-  border: none;
   background: ${(props) => (props.active ? '#007bff' : 'lightblue')};
   cursor: pointer;
   text-transform: uppercase;
   font-size: 1.5vh;
 
   img {
-    width: 5vw; 
+    width: 4vw; 
     height: auto; 
-    margin-bottom: 1vh;
   }
 
   span {

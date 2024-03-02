@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import format from 'date-fns/format';
 import getDay from 'date-fns/getDay';
 import parse from 'date-fns/parse';
@@ -25,7 +25,7 @@ const localizer = dateFnsLocalizer({
 
 interface Booking {
     eid: number;
-    start_time?: string | Date;
+    start?: string | Date;
     end_time?: string | Date;
 }
 
@@ -36,41 +36,46 @@ const formats = {
 function CalendarTemplate() {
   const hook = useBookings();
 
-  const [isSlotOpen, setIsSlotOpen] = useState<boolean>(false);
-  const [isEventModalOpen, setIsEventModalOpen] = useState<boolean>(false);
+  const [isSlotOpen, setIsSlotOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [eid, setEid] = useState<number | null>(null);
+  const [shouldRefetch, setShouldRefetch] = useState(false);
 
   const handleSlotClick = () => {
     setIsSlotOpen(!isSlotOpen);
   };
 
-  const handleCloseSlotModal = () => {
+  const handleCloseModal = () => {
     setIsSlotOpen(false);
-  };
-
-  const handleCloseEventModal = () => {
     setIsEventModalOpen(false);
+    setShouldRefetch(true);
   };
-
   const handleEventClick = (event: any) => {
     setIsEventModalOpen(!isEventModalOpen);
     setEid(event.eid as number);
   };
 
-  const convertDate = (data: Booking[]): Booking[] => {
-    const modifiedData = data.map((item) => {
-      const newItem = { ...item };
-      if (newItem.start_time) {
-        newItem.start_time = new Date(newItem.start_time);
-      }
-      if (newItem.end_time) {
-        newItem.end_time = new Date(newItem.end_time);
-      }
-      return newItem;
-    });
+  const convertDate = (data: Booking[]): Booking[] => data.map((item) => {
+    const newItem = { ...item };
+    if (newItem.start) {
+      newItem.start = new Date(newItem.start);
+    }
+    if (newItem.end_time) {
+      newItem.end_time = new Date(newItem.end_time);
+    }
+    return newItem;
+  });
 
-    return modifiedData;
+  const refetchBookings = () => {
+    hook.hookGetBookings();
+    setShouldRefetch(false);
   };
+
+  useEffect(() => {
+    if (shouldRefetch) {
+      refetchBookings();
+    }
+  }, [shouldRefetch, hook.hookGetBookings]);
 
   return (
     <div>
@@ -79,13 +84,13 @@ function CalendarTemplate() {
         {isSlotOpen && (
         <AddBookingModal
           isOpen={isSlotOpen}
-          onClose={handleCloseSlotModal}
+          onClose={handleCloseModal}
         />
         )}
         {isEventModalOpen && (
         <GetBookingModal
           isOpen={isEventModalOpen}
-          onClose={handleCloseEventModal}
+          onClose={handleCloseModal}
           eid={eid!}
         />
         )}
@@ -94,7 +99,7 @@ function CalendarTemplate() {
         localizer={localizer}
         formats={formats}
         events={convertDate(hook.hookBookings as Booking[])}
-        startAccessor="start_time"
+        startAccessor="start"
         endAccessor="end_time"
         style={{ height: 900, margin: '50px' }}
         onSelectSlot={handleSlotClick}

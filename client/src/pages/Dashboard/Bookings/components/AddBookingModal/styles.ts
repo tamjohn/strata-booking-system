@@ -1,71 +1,91 @@
 import styled from 'styled-components';
 
-export const ButtonStyled = styled.div`
-  margin-left: 1rem;
-`;
-
-export const PopUpBox = styled.div`
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  position: center;
-  overflow: hidden;
-  width: 150px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  justify-content: center;
+  z-index: 1000;
 `;
 
-export const FormField = styled.div`
+export const ModalContainer = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px; 
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+`;
+
+export const ModalHeader = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 `;
 
-export const Label = styled.label`
-  font-weight: bold;
-  margin-bottom: 5px;
+export const ModalTitle = styled.h3`
+  margin: 0;
+`;
+
+export const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+`;
+
+export const ModalBody = styled.div`
+`;
+
+export const FormField = styled.div`
+  margin-bottom: 20px;
 `;
 
 export const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
+  width: 100%; 
+  padding: 15px; 
+  font-size: 1rem;
   border-radius: 4px;
-  font-size: 14px;
+  border: 1px solid #ccc;
 `;
 
-export const StyledButton = styled.button`
+export const ButtonRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+`;
+
+export const SubmitButton = styled.button`
   padding: 10px 20px;
   background-color: #007bff;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
 
-&:hover {
-  background-color: #0056b3;
-}
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
-export const StyledCancelButton = styled(StyledButton)`
-  background-color: #ccc;
-  margin-left: 1rem;
+export const CancelButton = styled(SubmitButton)`
+  background-color: #6c757d;
 
-&:hover {
-  background-color: #999;
-}
+  &:hover {
+    background-color: #5a6268;
+  }
 `;
 
-export const ModalOverlay = styled.div`
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background-color: rgba(0, 0, 0, 0.5);
-backdrop-filter: blur(5px);
-display: flex;
-align-items: center;
-justify-content: center;
-z-index: 9999;
+export const Label = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333; // Adjust the color as needed
 `;

@@ -11,7 +11,7 @@ app.use(express.json());
 type Booking = {
     eid: number;
     title: string;
-    start_time: string; 
+    start: string; 
     end_time: string; 
     allDay?: boolean; 
     resource?: boolean; 
@@ -31,8 +31,8 @@ type UpdateBooking = {
 // API POST endpoint to create a booking
 app.post("/bookings", async (req, res) => {
     try {
-        const { eid, title, start_time, end_time, allDay, resource }: Booking = req.body;
-        const insertValues: Array<string | number | boolean> = [eid, title, start_time, end_time];
+        const { eid, title, start, end_time, allDay, resource }: Booking = req.body;
+        const insertValues: Array<string | number | boolean> = [eid, title, start, end_time];
         const valuePlaceholders = ["$1", "$2", "$3", "$4"];
         const insertColumns = ["eid", "title", "start", "end_time"];
 
@@ -53,7 +53,7 @@ app.post("/bookings", async (req, res) => {
 
         res.json(newBooking.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
     }
 });
 
@@ -63,7 +63,7 @@ app.get('/bookings', async (req, res) => {
         const allBookings = await pool.query("SELECT * FROM bookings");
         res.json(allBookings.rows);
     } catch (err) {
-        console.log(err.message);
+        console.log(err);
     }
 });
 
@@ -77,62 +77,54 @@ app.get('/bookings/:eid', async (req, res) => {
 
         res.json(booking.rows[0]);
     } catch (err) {
-        console.log(err.message);
+        console.log(err);
     }
 });
 
-// API PUT endpoing to update a booking
+// API PUT endpoint to update a single booking
 app.put("/bookings/:eid", async (req, res) => {
     try {
-        const { eid } = req.params; 
+        const { eid } = req.params;
         const { title, start, end_time, allDay, resource }: UpdateBooking = req.body;
 
-        // Check if required fields are missing
         if (!eid || !start || !end_time) {
             return res.status(400).json("Missing required fields");
         }
 
         const updateFields: string[] = [];
-        const updateValues: (string | number | boolean)[] = [eid];
-
-        // Build the SET clause for the UPDATE statement
-        updateFields.push("eid = $1");
-        updateValues.push(eid);
+        const updateValues: (string | number | boolean)[] = [];
 
         if (title !== undefined) {
-            updateFields.push("title = $2");
+            updateFields.push("title = $1");
             updateValues.push(title);
         }
 
-        updateFields.push("start = $3", "end_time = $4");
+        updateFields.push("start = $2", "end_time = $3");
         updateValues.push(start, end_time);
 
-        // Handle optional fields
         if (allDay != null) {
-            updateFields.push("allDay = $5");
+            updateFields.push("allDay = $4");
             updateValues.push(allDay);
         }
         if (resource != null) {
-            updateFields.push("resource = $6");
+            updateFields.push("resource = $5");
             updateValues.push(resource);
         }
 
-        // Combine the SET clause and the WHERE condition for the UPDATE statement
-        console.log('update fields', updateFields);
-        console.log('update values', updateValues);
-        const updateQuery = `UPDATE bookings SET ${updateFields.join(", ")} WHERE eid = $1`;
+        updateValues.push(eid);
+
+        const updateQuery = `UPDATE bookings SET ${updateFields.join(", ")} WHERE eid = $${updateValues.length}`;
         console.log(updateQuery);
 
-        // Execute the query
         await pool.query(updateQuery, updateValues);
 
-        // // Retrieve the updated result
-        // const updatedBooking = await pool.query("SELECT * FROM bookings WHERE eid = $1", [id]);
+        const updatedBooking = await pool.query("SELECT * FROM bookings WHERE eid = $1", [eid]);
 
-        // res.json(updatedBooking.rows[0]);
-        // console.log(updatedBooking.rows[0]);
+        res.json(updatedBooking.rows[0]);
+        console.log(updatedBooking.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
+        res.status(500).send('Server error');
     }
 });
 
@@ -140,12 +132,10 @@ app.put("/bookings/:eid", async (req, res) => {
 app.delete("/bookings/:eid", async (req, res) => {
     try {
         const { eid } = req.params;
-        const deleteBooking = await pool.query("DELETE FROM bookings WHERE eid = $1", [
-            eid
-        ]);
+        await pool.query("DELETE FROM bookings WHERE eid = $1", [eid]);
         res.json("booking was deleted!");
     } catch (err) {
-        console.log(err.message);
+        console.log(err);
     }
 });
 
