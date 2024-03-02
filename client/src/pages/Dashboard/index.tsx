@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as Styled from './styles';
 import { MenuBar } from '../../components/MenuBar';
-import Home from './Home';
+import Home from './HomePage';
 import Bookings from './Bookings';
 import Announcements from './Announcements';
 import Requests from './Requests';

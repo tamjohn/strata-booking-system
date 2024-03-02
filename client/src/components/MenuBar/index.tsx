@@ -4,6 +4,7 @@ import HomeIcon from '../../assets/images/houseIcon.png';
 import BookingsIcon from '../../assets/images/bookingIcon.png';
 import RequestsIcon from '../../assets/images/requestsIcon.png';
 import AnnouncementsIcon from '../../assets/images/announcementIcon.png';
+import TutorialIcon from '../../assets/images/tutorialIcon.png';
 
 type MenuBarProps = {
   activeTab: string;
@@ -51,6 +52,16 @@ export const MenuBar: React.FC<MenuBarProps> = ({ activeTab, setActiveTab }) => 
         alt="Requests"
       />
       <span>Requests</span>
+    </Styled.MenuButton>
+    <Styled.MenuButton
+      active={activeTab === 'tutorials'}
+      onClick={() => setActiveTab('tutorials')}
+    >
+      <img
+        src={TutorialIcon}
+        alt="Tutorials"
+      />
+      <span>Tutorials</span>
     </Styled.MenuButton>
   </Styled.MenuBarContainer>
 );
