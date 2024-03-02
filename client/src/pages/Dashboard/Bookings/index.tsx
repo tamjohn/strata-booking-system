@@ -79,7 +79,7 @@ function CalendarTemplate() {
 
   return (
     <div>
-      <h1> EPS Multi-Court Booking</h1>
+      <h1>Multi-Court Booking</h1>
       <div>
         {isSlotOpen && (
         <AddBookingModal

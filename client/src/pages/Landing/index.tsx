@@ -4,6 +4,10 @@ import * as Styled from './styles';
 import logo from '../../assets/images/AlexandraCourtLogo.png';
 import Button from '../../components/Button';
 
+interface LoginResponse {
+  token: string;
+}
+
 const LandingPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -12,10 +16,29 @@ const LandingPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (event: any) => {
-    console.log('button was clicked');
+  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    navigate('/dashboard', { replace: true });
+    if (!isFormFilled) return;
+
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, password }),
+      });
+
+      if (!response.ok) throw new Error('Login failed');
+
+      const data: LoginResponse = await response.json();
+      localStorage.setItem('token', data.token);
+
+      navigate('/dashboard', { replace: true });
+    } catch (error) {
+      console.error(error);
+      alert('Login failed');
+    }
   };
 
   return (

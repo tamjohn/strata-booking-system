@@ -5,6 +5,7 @@ import Home from './HomePage';
 import Bookings from './Bookings';
 import Announcements from './Announcements';
 import Requests from './Requests';
+import Tutorials from './Tutorials';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -23,6 +24,9 @@ const Dashboard = () => {
       break;
     case 'requests':
       ContentComponent = Requests;
+      break;
+    case 'tutorials':
+      ContentComponent = Tutorials;
       break;
     default:
       ContentComponent = Home;

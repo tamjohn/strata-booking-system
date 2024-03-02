@@ -1,12 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import pool from './db';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
 //middleware
 app.use(cors());
 app.use(express.json());
+
+const JWT_SECRET = '123aBcDe4FDS'
 
 type Booking = {
     eid: number;
@@ -138,6 +142,35 @@ app.delete("/bookings/:eid", async (req, res) => {
         console.log(err);
     }
 });
+
+// API POST endpoint for residents to login
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+  
+    try {
+      const userResult = await pool.query('SELECT * FROM residents WHERE email = $1', [email]);
+
+      if (userResult.rows.length === 0) {
+        return res.status(401).json({ message: 'Authentication failed' });
+      }
+  
+      const user = userResult.rows[0];
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Authentication failed' });
+      }
+  
+      const token = jwt.sign({ userId: user.resident_id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+      res.json({ token });
+    } catch (error) {
+      console.error('Error during login:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 app.listen(5000, () => {
     console.log("server has started on port 5000");
