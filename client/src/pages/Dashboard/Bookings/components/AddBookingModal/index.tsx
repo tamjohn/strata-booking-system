@@ -83,11 +83,7 @@ export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClos
       .then(async (response) => {
         if (!response.ok) {
           const errorData = await response.json();
-          if (errorData.message.includes('already made 3 bookings this month')) {
-            throw new Error('ERROR: You have already made 3 bookings this month.');
-          } else {
-            throw new Error('Network response was not ok');
-          }
+          throw new Error(errorData.message);
         }
         return response.json();
       })

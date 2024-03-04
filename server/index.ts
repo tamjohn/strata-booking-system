@@ -11,31 +11,31 @@ app.use(cors());
 app.use(express.json());
 
 const JWT_SECRET = '123aBcDe4FDS';
-  
+
 type Booking = {
     eid: number;
     title: string;
-    start: string; 
-    end_time: string; 
-    allDay?: boolean; 
-    resource?: boolean; 
+    start: string;
+    end_time: string;
+    allDay?: boolean;
+    resource?: boolean;
 };
 
-interface UpdateBooking extends Partial<Booking> {}
+interface UpdateBooking extends Partial<Booking> { }
 
 interface ExtendedJwtPayload extends JwtPayload {
     userId: number;
     email: string;
-  }
-  
+}
+
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];
-  
+
     if (!token) {
-      return res.sendStatus(401);
+        return res.sendStatus(401);
     }
-  
+
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             console.log("JWT Verification Error:", err);
@@ -51,9 +51,9 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 // API POST endpoint to create a booking
 app.post("/bookings", authenticateToken, async (req, res) => {
     try {
-        const userId = req.user?.userId; 
+        const userId = req.user?.userId;
         if (!userId) {
-           return res.status(403).json({ message: "User ID missing from request" });
+            return res.status(403).json({ message: "User ID missing from request" });
         }
 
         const bookingStartDate = new Date(req.body.start);
@@ -69,7 +69,7 @@ app.post("/bookings", authenticateToken, async (req, res) => {
         const bookingsCount = parseInt(countResult.rows[0].count);
 
         if (bookingsCount >= 3) {
-            return res.status(400).json({ message: "You have already made 3 bookings for the booking month." });
+            return res.status(400).json({ message: "ERROR: You have already made 3 bookings for the booking month." });
         }
 
         const maxEidResult = await pool.query('SELECT MAX(eid) FROM bookings');
@@ -235,24 +235,24 @@ app.delete("/bookings/:eid", authenticateToken, async (req: Request, res: Respon
 // API POST endpoint for residents to login
 app.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
-  
+
     try {
-      const userResult = await pool.query('SELECT * FROM residents WHERE email = $1', [email]);
-      if (userResult.rows.length === 0) {
-        return res.status(401).json({ message: 'Authentication failed' });
-      }
-  
-      const user = userResult.rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Authentication failed' });
-      }
-  
-      const token = jwt.sign({ userId: user.resident_id, email: user.email }, JWT_SECRET, { expiresIn: '3h' });
-      res.json({ token });
+        const userResult = await pool.query('SELECT * FROM residents WHERE email = $1', [email]);
+        if (userResult.rows.length === 0) {
+            return res.status(401).json({ message: 'Authentication failed' });
+        }
+
+        const user = userResult.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Authentication failed' });
+        }
+
+        const token = jwt.sign({ userId: user.resident_id, email: user.email }, JWT_SECRET, { expiresIn: '3h' });
+        res.json({ token });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

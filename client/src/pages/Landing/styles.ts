@@ -13,7 +13,7 @@ export const PageContainer = styled.div`
 `;
 
 export const LogoContainer = styled.div`
-  width: 25vw; 
+  width: 30vw; 
   height: 100vh; 
   display: flex;
   justify-content: center;
@@ -22,13 +22,13 @@ export const LogoContainer = styled.div`
 `;
 
 export const ContentContainer = styled.div`
-  width: 75vw; 
+  width: 70vw; 
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 15vh; 
+  padding-top: 10vh; 
   background-image: url(${landingBackground});
   background-size: cover;
   background-position: center;
