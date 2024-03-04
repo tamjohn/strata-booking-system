@@ -8,10 +8,11 @@ interface AddBookingModalProps {
 }
 
 export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClose }) => {
-  const [description, setDescription] = useState<string>('');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const hook = useBookings();
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
@@ -25,42 +26,84 @@ export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClos
     setEndDate(event.target.value);
   };
 
+  const validateForm = () => {
+    if (!description || !startDate || !endDate) {
+      return 'ERROR: All fields must be filled out.';
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      return 'ERROR: Start Time cannot come after End Time.';
+    }
+
+    if (start.getHours() < 8) {
+      return 'ERROR: Start Time cannot be before 8 AM.';
+    }
+
+    if (end.getHours() >= 23 && end.getMinutes() > 0) {
+      return 'ERROR: End Time cannot be after 11 PM.';
+    }
+
+    const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+
+    if (duration > 3) {
+      return 'ERROR: Booking duration cannot exceed 3 hours.';
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const body = {
-        eid: Math.floor(Math.random() * 1000),
-        title: description,
-        start: new Date(startDate).toISOString(),
-        end_time: new Date(endDate).toISOString(),
-      };
-      fetch('http://localhost:5000/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-        .then((response) => {
-          if (!response.ok) {
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    setError(null);
+
+    const token = localStorage.getItem('token');
+    const body = {
+      title: description,
+      start: new Date(startDate).toISOString(),
+      end_time: new Date(endDate).toISOString(),
+    };
+
+    fetch('http://localhost:5000/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (errorData.message.includes('already made 3 bookings this month')) {
+            throw new Error('ERROR: You have already made 3 bookings this month.');
+          } else {
             throw new Error('Network response was not ok');
           }
-          return response.json();
-        })
-        .then((data) => {
-          console.log('Response data:', data);
-          setDescription('');
-          setStartDate('');
-          setEndDate('');
-          onClose();
-          hook.hookGetBookings();
-          console.log('Booking submitted successfully');
-        })
-        .catch((err) => {
-          console.error('Error submitting data', err);
-        });
-    } catch (err) {
-      console.error('An unexpected error occurred:', err);
-    }
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Response data:', data);
+        setDescription('');
+        setStartDate('');
+        setEndDate('');
+        onClose();
+        hook.hookGetBookings();
+        console.log('Booking submitted successfully');
+      })
+      .catch((err) => {
+        console.error('Error submitting data', err);
+        setError(err.message);
+      });
   };
 
   if (!isOpen) {
@@ -75,6 +118,7 @@ export const AddBookingModal: React.FC<AddBookingModalProps> = ({ isOpen, onClos
           <Styled.CloseButton onClick={onClose}>×</Styled.CloseButton>
         </Styled.ModalHeader>
         <Styled.ModalBody>
+          {error && <Styled.Error>{error}</Styled.Error>}
           <form onSubmit={handleSubmit}>
             <Styled.FormField>
               <Styled.Label>Description (include unit number + activity):</Styled.Label>

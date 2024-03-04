@@ -72,6 +72,11 @@ export const SubmitButton = styled.button`
   &:hover {
     background-color: #0056b3;
   }
+
+  &:disabled {
+    background-color: #cccccc; 
+    cursor: not-allowed;
+  }
 `;
 
 export const CancelButton = styled(SubmitButton)`
@@ -88,6 +93,11 @@ export const DeleteButton = styled(SubmitButton)`
   &:hover {
     background-color: #c82333;
   }
+
+  &:disabled {
+    background-color: #cccccc; 
+    cursor: not-allowed;
+  }
 `;
 
 export const Label = styled.label`
@@ -95,5 +105,12 @@ export const Label = styled.label`
   margin-bottom: 8px;
   font-weight: bold;
   font-size: 1rem;
-  color: #333; // Adjust the color as needed
+  color: #333; 
+`;
+
+export const Error = styled.div`
+  color: red; 
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1rem;
 `;

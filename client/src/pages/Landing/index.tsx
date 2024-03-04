@@ -34,6 +34,12 @@ const LandingPage = () => {
       const data: LoginResponse = await response.json();
       localStorage.setItem('token', data.token);
 
+      fetch('http://localhost:5000/protected-route', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
       navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error(error);

@@ -87,5 +87,12 @@ export const Label = styled.label`
   margin-bottom: 8px;
   font-weight: bold;
   font-size: 1rem;
-  color: #333; // Adjust the color as needed
+  color: #333; 
+`;
+
+export const Error = styled.div`
+  color: red; 
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1rem;
 `;

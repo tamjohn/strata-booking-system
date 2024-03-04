@@ -5,6 +5,7 @@ interface Booking {
   title: string;
   start: string;
   end_time: string;
+  resident_id?: number;
 }
 
 export const useBookings = () => {
@@ -54,6 +55,7 @@ export const useBookings = () => {
 
   const updateSingleBooking = async (): Promise<void> => {
     try {
+      const token = localStorage.getItem('token');
       const body = {
         eid: bookingID,
         title: description,
@@ -62,7 +64,10 @@ export const useBookings = () => {
       };
       await fetch(`http://localhost:5000/bookings/${bookingID}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(body),
       });
       setBookingID(bookingID);
@@ -76,9 +81,15 @@ export const useBookings = () => {
 
   const deleteBooking = async (eid: number): Promise<void> => {
     try {
+      const token = localStorage.getItem('token');
+
       const response = await fetch(`http://localhost:5000/bookings/${eid}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       if (!response.ok) {
         throw new Error('Failed to delete the booking');
       }
@@ -91,6 +102,7 @@ export const useBookings = () => {
       console.error('Error deleting booking:', err);
     }
   };
+
   const setDescriptionHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
     console.log('Setting description to:', e.target.value);
     setDescription(e.target.value);
